@@ -1,9 +1,8 @@
 module Enumerable
-
   def my_each
     return to_enum(:my_each) unless block_given?
     n = 0
-    while n < self.length do 
+    while n < self.length do
       yield(self[n]) if self.is_a?(Array)
       yield(keys[n], self[keys[n]]) if self.is_a?(Hash)
       yield(self[n]) if self.is_a?(Range)
@@ -28,11 +27,11 @@ module Enumerable
     return to_enum(:my_select) unless block_given?
     if self.is_a?(Array)
       result = []
-      self.my_each{|element| result << element if yield(element)}
+      self.my_each { |element| result << element if yield(element) }
 
     elsif self.is_a?(Hash)
       result = {}
-      self.my_each{|e_key, e_value| result[e_key] = e_value if yield(e_key, e_value)}
+      self.my_each { |e_key, e_value| result[e_key] = e_value if yield(e_key, e_value) }
     end
     p result
   end
@@ -40,12 +39,12 @@ module Enumerable
   def my_all?(block = false)
     a = true
     self.my_each do |element|
-      if(block)
+      if block
         c = element.is_a?(block)
       else
         c = yield(element)
       end
-      a = a && c
+      a &&= c
     end
     p a
   end
@@ -53,12 +52,12 @@ module Enumerable
   def my_any?(block = false)
     a = false
     self.my_each do |element|
-      if(block)
+      if block
         c = element.is_a?(block)
       else
         c = yield(element)
       end
-      a = a || c
+      a ||= c
     end
     p a
   end
@@ -66,24 +65,24 @@ module Enumerable
   def my_none?(block = false)
     a = false
     self.my_each do |element|
-      if(block)
+      if block
         c = element.is_a?(block)
       else
         c = yield(element)
       end
-      a = a || c
+      a ||= c
     end
     p !a
   end
 
-  def my_count(block = false) #My COunt
+  def my_count(block = false)
     result = []
     self.my_each do |element|
-      if(block && element == block)
+      if block && element == block
         result << element
-      elsif (block_given? && yield(element))
+      elsif block_given? && yield(element)
         result << element
-      elsif (!block && !block_given?)
+      elsif !block && !block_given?
         result << element
       end
     end
@@ -91,7 +90,7 @@ module Enumerable
     a
   end
 
-  def my_map #My Map
+  def my_map
     result = []
     self.my_each do |element|
       result << yield(element)
@@ -99,24 +98,23 @@ module Enumerable
     p result
   end
 
-  def my_inject(block = false) #My Inject
-    if (block)
+  def my_inject(block = false)
+    if block
       accumulator = block
       self.my_each do |element|
         accumulator = yield(accumulator, element)
-       end
+      end
        
-    elsif (!block)
-      self.my_each{|element| element == self[0]? accumulator = self[0] : accumulator = yield(accumulator, element)}
+    elsif !block
+      self.my_each { |element| element == self[0] ? accumulator = self[0] : accumulator = yield(accumulator, element) }
     end
     p accumulator
   end
-
 end
 
-array1 = [1.6, 4.6, 56, 6, 7, 23, 5, 7, 3, 67, 8, 400]
-array = [2, 3, 4, 5, 6, 7]
-hash = {"hey" => "new", "hi" => "hello", "wow" => "what happened"};
+# array1 = [1.6, 4.6, 56, 6, 7, 23, 5, 7, 3, 67, 8, 400]
+# array = [2, 3, 4, 5, 6, 7]
+# hash = { "hey" => "new", "hi" => "hello", "wow" => "what happened" }
 
 # array.my_each
 # array.my_each_with_index {|d, e| puts "Index #{e} is #{d}"}
@@ -127,4 +125,4 @@ hash = {"hey" => "new", "hi" => "hello", "wow" => "what happened"};
 # array.my_any? { |friend| friend.is_a?(String)}
 # hash.my_select { |key, value| key != "wow"}
 # array.my_map {|d| d*2}
-array.my_inject {|d, n| d+n}
+# array.my_inject {|d, n| d+n}
