@@ -111,18 +111,3 @@ module Enumerable
     p accumulator
   end
 end
-
-# array1 = [1.6, 4.6, 56, 6, 7, 23, 5, 7, 3, 67, 8, 400]
-# array = [2, 3, 4, 5, 6, 7]
-# hash = { "hey" => "new", "hi" => "hello", "wow" => "what happened" }
-
-# array.my_each
-# array.my_each_with_index {|d, e| puts "Index #{e} is #{d}"}
-# hash.my_each_with_index {|d, e| puts "#{d} => #{e}"}
-# hash.my_each {|d| puts " #{d}"}
-# array.my_select { |friend| friend != 4}
-# array.my_count
-# array.my_any? { |friend| friend.is_a?(String)}
-# hash.my_select { |key, value| key != "wow"}
-# array.my_map {|d| d*2}
-# array.my_inject {|d, n| d+n}
