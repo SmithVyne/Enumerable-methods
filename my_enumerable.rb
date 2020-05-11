@@ -1,6 +1,7 @@
 module Enumerable
 
   def my_each
+    return to_enum(:my_each) unless block_given?
     n = 0
     while n < self.length do 
       yield(self[n]) if self.is_a?(Array)
@@ -12,6 +13,7 @@ module Enumerable
   end
 
   def my_each_with_index
+    return to_enum(:my_each_with_index) unless block_given?
     n = 0
     while n < self.length do
       yield(self[n], self.index(self[n])) if self.is_a?(Array)
@@ -23,6 +25,7 @@ module Enumerable
   end
 
   def my_select
+    return to_enum(:my_select) unless block_given?
     if self.is_a?(Array)
       result = []
       self.my_each{|element| result << element if yield(element)}
@@ -73,9 +76,8 @@ module Enumerable
     p !a
   end
 
-  def my_count(block = false)
+  def my_count(block = false) #My COunt
     result = []
-    # a = false
     self.my_each do |element|
       if(block && element == block)
         result << element
@@ -86,19 +88,43 @@ module Enumerable
       end
     end
     a = result.length
-    p a
+    a
+  end
+
+  def my_map #My Map
+    result = []
+    self.my_each do |element|
+      result << yield(element)
+    end
+    p result
+  end
+
+  def my_inject(block = false) #My Inject
+    if (block)
+      accumulator = block
+      self.my_each do |element|
+        accumulator = yield(accumulator, element)
+       end
+       
+    elsif (!block)
+      self.my_each{|element| element == self[0]? accumulator = self[0] : accumulator = yield(accumulator, element)}
+    end
+    p accumulator
   end
 
 end
 
-array = [1.6, 4.6, 56, 6, 7, 23, 5, 7, 3, 67, 8, 400]
+array1 = [1.6, 4.6, 56, 6, 7, 23, 5, 7, 3, 67, 8, 400]
+array = [2, 3, 4, 5, 6, 7]
 hash = {"hey" => "new", "hi" => "hello", "wow" => "what happened"};
 
-# array.each
-# array.my_each_with_index {|d, e| puts "Ind    endex #{e} is #{d}"}
+# array.my_each
+# array.my_each_with_index {|d, e| puts "Index #{e} is #{d}"}
 # hash.my_each_with_index {|d, e| puts "#{d} => #{e}"}
 # hash.my_each {|d| puts " #{d}"}
 # array.my_select { |friend| friend != 4}
-array.my_count
-# array.my_none? { |friend| friend == 546476376}
+# array.my_count
+# array.my_any? { |friend| friend.is_a?(String)}
 # hash.my_select { |key, value| key != "wow"}
+# array.my_map {|d| d*2}
+array.my_inject {|d, n| d+n}
