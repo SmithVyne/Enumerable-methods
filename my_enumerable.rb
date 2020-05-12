@@ -28,6 +28,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     if is_a?(Array)
       result = []
       my_each { |element| result << element if yield(element) }
+
     elsif is_a?(Hash)
       result = {}
       my_each { |e_key, e_value| result[e_key] = e_value if yield(e_key, e_value) }
@@ -35,39 +36,63 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     result
   end
 
-  def my_all?(block = false)
+  def my_all?(block = false) # rubocop:disable Metrics/PerceivedComplexity
     a = true
     my_each do |element|
       c = if block
-            element.is_a?(block)
-          else
+            if block.is_a?(Regexp)
+              element = element.to_s unless element.is_a? String
+              block === element # rubocop:disable Style/CaseEquality
+
+            elsif !block.is_a?(Regexp)
+              element.is_a?(block)
+            end
+          elsif block_given?
             yield(element)
+          else
+            true
           end
       a &&= c
     end
     a
   end
 
-  def my_any?(block = false)
+  def my_any?(block = false) # rubocop:disable Metrics/PerceivedComplexity
     a = false
     my_each do |element|
       c = if block
-            element.is_a?(block)
-          else
+            if block.is_a?(Regexp)
+              element = element.to_s unless element.is_a? String
+              block === element # rubocop:disable Style/CaseEquality
+
+            elsif !block.is_a?(Regexp)
+              element.is_a?(block)
+            end
+          elsif block_given?
             yield(element)
+          else
+            true
           end
       a ||= c
     end
     a
   end
 
-  def my_none?(block = false)
+  def my_none?(block = false) # rubocop:disable Metrics/PerceivedComplexity
     a = false
     my_each do |element|
       c = if block
-            element.is_a?(block)
-          else
+            if block.is_a?(Regexp)
+              element = element.to_s unless element.is_a? String
+              block === element # rubocop:disable Style/CaseEquality
+
+            elsif !block.is_a?(Regexp)
+              element.is_a?(block)
+            end
+          elsif block_given?
             yield(element)
+          else
+            true
           end
       a ||= c
     end
@@ -90,6 +115,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
   end
 
   def my_map
+    return to_enum(:my_map) unless block_given?
     result = []
     my_each do |element|
       result << yield(element)
