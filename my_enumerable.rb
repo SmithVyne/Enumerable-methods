@@ -115,7 +115,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
   end
 
   def my_map
-    return to_enum(:my_map) unless block_given?
+    return to_enum(:my_map) unless block_given? # rubocop:disable Layout/EmptyLineAfterGuardClause
     result = []
     my_each do |element|
       result << yield(element)
@@ -135,4 +135,3 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     accumulator
   end
 end
-
