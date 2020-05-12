@@ -1,11 +1,11 @@
-module Enumerable
+module Enumerable # rubocop:disable Metrics/ModuleLength
   def my_each
     return to_enum(:my_each) unless block_given?
     n = 0
-    while n < self.length
-      yield(self[n]) if self.is_a?(Array)
-      yield(keys[n], self[keys[n]]) if self.is_a?(Hash)
-      yield(self[n]) if self.is_a?(Range)
+    while n < length
+      yield(self[n]) if is_a?(Array)
+      yield(keys[n], self[keys[n]]) if is_a?(Hash)
+      yield(self[n]) if is_a?(Range)
       n += 1
     end
     self
@@ -14,10 +14,10 @@ module Enumerable
   def my_each_with_index
     return to_enum(:my_each_with_index) unless block_given?
     n = 0
-    while n < self.length
-      yield(self[n], self.index(self[n])) if self.is_a?(Array)
-      yield(keys[n], self[keys[n]]) if self.is_a?(Hash)
-      yield(self[n]) if self.is_a?(Range)
+    while n < length
+      yield(self[n], index(self[n])) if is_a?(Array)
+      yield(keys[n], self[keys[n]]) if is_a?(Hash)
+      yield(self[n]) if is_a?(Range)
       n += 1
     end
     self
@@ -25,25 +25,24 @@ module Enumerable
 
   def my_select
     return to_enum(:my_select) unless block_given?
-    if self.is_a?(Array)
+    if is_a?(Array)
       result = []
-      self.my_each { |element| result << element if yield(element) }
-
-    elsif self.is_a?(Hash)
+      my_each { |element| result << element if yield(element) }
+    elsif is_a?(Hash)
       result = {}
-      self.my_each { |e_key, e_value| result[e_key] = e_value if yield(e_key, e_value) }
+      my_each { |e_key, e_value| result[e_key] = e_value if yield(e_key, e_value) }
     end
     result
   end
 
   def my_all?(block = false)
     a = true
-    self.my_each do |element|
-      if block
-        c = element.is_a?(block)
-      else
-        c = yield(element)
-      end
+    my_each do |element|
+      c = if block
+            element.is_a?(block)
+          else
+            yield(element)
+          end
       a &&= c
     end
     a
@@ -51,12 +50,12 @@ module Enumerable
 
   def my_any?(block = false)
     a = false
-    self.my_each do |element|
-      if block
-        c = element.is_a?(block)
-      else
-        c = yield(element)
-      end
+    my_each do |element|
+      c = if block
+            element.is_a?(block)
+          else
+            yield(element)
+          end
       a ||= c
     end
     a
@@ -64,20 +63,20 @@ module Enumerable
 
   def my_none?(block = false)
     a = false
-    self.my_each do |element|
-      if block
-        c = element.is_a?(block)
-      else
-        c = yield(element)
-      end
+    my_each do |element|
+      c = if block
+            element.is_a?(block)
+          else
+            yield(element)
+          end
       a ||= c
     end
     !a
   end
 
-  def my_count(block = false)
+  def my_count(block = false) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     result = []
-    self.my_each do |element|
+    my_each do |element|
       if block && element == block
         result << element
       elsif block_given? && yield(element)
@@ -92,7 +91,7 @@ module Enumerable
 
   def my_map
     result = []
-    self.my_each do |element|
+    my_each do |element|
       result << yield(element)
     end
     result
@@ -101,11 +100,11 @@ module Enumerable
   def my_inject(block = false)
     if block
       accumulator = block
-      self.my_each do |element|
+      my_each do |element|
         accumulator = yield(accumulator, element)
       end
     elsif !block
-      self.my_each { |element| element == self[0] ? accumulator = self[0] : accumulator = yield(accumulator, element) }
+      my_each { |element| accumulator = element == self[0] ? self[0] : yield(accumulator, element) }
     end
     accumulator
   end
