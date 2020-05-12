@@ -135,3 +135,4 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     accumulator
   end
 end
+
