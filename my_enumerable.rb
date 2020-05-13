@@ -11,6 +11,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     self
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength
   def my_each_with_index
     return to_enum(:my_each_with_index) unless block_given?
     n = 0
@@ -36,7 +37,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     result
   end
 
-  def my_all?(block = false) # rubocop:disable Metrics/PerceivedComplexity
+  def my_all?(block = false)
     a = true
     my_each do |element|
       c = if block
@@ -46,20 +47,26 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
               block === element # rubocop:disable Style/CaseEquality
 
             elsif !block.is_a?(Regexp)
-              block.is_a?(Method) ? element.is_a?(block) : block == element ? block == element : false
+              if block.is_a?(Method)
+                element.is_a?(block)
+              elsif block == element
+                block == element
+              else
+                false
+              end
             end
 
           elsif block_given?
             yield(element)
           elsif !block && !block_given?
-            !!element
+            !!element # rubocop:disable Style/DoubleNegation
           end
       a &&= c
     end
     a
   end
 
-  def my_any?(block = false) # rubocop:disable Metrics/PerceivedComplexity
+  def my_any?(block = false)
     a = false
     my_each do |element|
       c = if block
@@ -68,19 +75,25 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
               block === element # rubocop:disable Style/CaseEquality
 
             elsif !block.is_a?(Regexp)
-              block.is_a?(Method) ? element.is_a?(block) : block == element ? block == element : false
+              if block.is_a?(Method)
+                element.is_a?(block)
+              elsif block == element
+                block == element
+              else
+                false
+              end
             end
           elsif block_given?
             yield(element)
           elsif !block && !block_given?
-            !!element
+            !!element # rubocop:disable Style/DoubleNegation
           end
       a ||= c
     end
     a
   end
 
-  def my_none?(block = false) # rubocop:disable Metrics/PerceivedComplexity
+  def my_none?(block = false)
     a = false
     my_each do |element|
       c = if block
@@ -89,19 +102,25 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
               block === element # rubocop:disable Style/CaseEquality
 
             elsif !block.is_a?(Regexp)
-              block.is_a?(Method) ? element.is_a?(block) : block == element ? block == element : false
+              if block.is_a?(Method)
+                element.is_a?(block)
+              elsif block == element
+                block == element
+              else
+                false
+              end
             end
           elsif block_given?
             yield(element)
           elsif !block && !block_given?
-            !!element
+            !!element # rubocop:disable Style/DoubleNegation
           end
       a ||= c
     end
     !a
   end
 
-  def my_count(block = false) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  def my_count(block = false)
     result = []
     my_each do |element|
       if block && element == block
@@ -117,7 +136,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
   end
 
   def my_map
-    return to_enum(:my_map) unless block_given? # rubocop:disable Layout/EmptyLineAfterGuardClause
+    return to_enum(:my_map) unless block_given?
     result = []
     my_each do |element|
       result << yield(element)
@@ -130,7 +149,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
       accumulator = block
       my_each do |element|
         if symbol.is_a?(Symbol)
-          accumulator = eval "#{accumulator} #{symbol} #{element}"
+          accumulator = eval "#{accumulator} #{symbol} #{element}" # rubocop:disable Security/Eval, Style/EvalWithLocation, Metrics/LineLength
         elsif !symbol.is_a?(Symbol)
           "#{symbol} is not a symbol nor a string"
         elsif !symbol
@@ -143,3 +162,4 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     accumulator
   end
 end
+# rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength
