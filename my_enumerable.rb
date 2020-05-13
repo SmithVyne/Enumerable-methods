@@ -40,17 +40,19 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     a = true
     my_each do |element|
       c = if block
+
             if block.is_a?(Regexp)
               element = element.to_s unless element.is_a? String
               block === element # rubocop:disable Style/CaseEquality
 
             elsif !block.is_a?(Regexp)
-              element.is_a?(block)
+              block.is_a?(Method) ? element.is_a?(block) : block == element ? block == element : false
             end
+
           elsif block_given?
             yield(element)
-          else
-            true
+          elsif !block && !block_given?
+            !!element
           end
       a &&= c
     end
@@ -66,12 +68,12 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
               block === element # rubocop:disable Style/CaseEquality
 
             elsif !block.is_a?(Regexp)
-              element.is_a?(block)
+              block.is_a?(Method) ? element.is_a?(block) : block == element ? block == element : false
             end
           elsif block_given?
             yield(element)
-          else
-            true
+          elsif !block && !block_given?
+            !!element
           end
       a ||= c
     end
@@ -87,12 +89,12 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
               block === element # rubocop:disable Style/CaseEquality
 
             elsif !block.is_a?(Regexp)
-              element.is_a?(block)
+              block.is_a?(Method) ? element.is_a?(block) : block == element ? block == element : false
             end
           elsif block_given?
             yield(element)
-          else
-            true
+          elsif !block && !block_given?
+            !!element
           end
       a ||= c
     end
@@ -123,11 +125,17 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     result
   end
 
-  def my_inject(block = false)
+  def my_inject(block = false, symbol = false)
     if block
       accumulator = block
       my_each do |element|
-        accumulator = yield(accumulator, element)
+        if symbol.is_a?(Symbol)
+          accumulator = eval "#{accumulator} #{symbol} #{element}"
+        elsif !symbol.is_a?(Symbol)
+          "#{symbol} is not a symbol nor a string"
+        elsif !symbol
+          accumulator = yield(accumulator, element)
+        end
       end
     elsif !block
       my_each { |element| accumulator = element == self[0] ? self[0] : yield(accumulator, element) }
