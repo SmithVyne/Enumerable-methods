@@ -11,7 +11,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     self
   end
 
-  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength, Lint/RedundantCopDisableDirective, Layout/EmptyLineAfterGuardClause
   def my_each_with_index
     return to_enum(:my_each_with_index) unless block_given?
     n = 0
@@ -137,6 +137,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
 
   def my_map
     return to_enum(:my_map) unless block_given?
+
     result = []
     my_each do |element|
       result << yield(element)
@@ -162,4 +163,4 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     accumulator
   end
 end
-# rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength
+# rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength, Lint/RedundantCopDisableDirective, Layout/EmptyLineAfterGuardClause
