@@ -12,13 +12,13 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
   end
 
   # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength, Lint/RedundantCopDisableDirective, Layout/EmptyLineAfterGuardClause
-  def my_each_with_index
+  def my_each_with_index(&block)
     return to_enum(:my_each_with_index) unless block_given?
     n = 0
     while n < length
-      yield(self[n], index(self[n])) if is_a?(Array)
-      yield(keys[n], self[keys[n]]) if is_a?(Hash)
-      yield(self[n]) if is_a?(Range)
+      block.call(self[n], n) if is_a?(Array)
+      block.call(keys[n], self[keys[n]]) if is_a?(Hash)
+      block.call(self[n]) if is_a?(Range)
       n += 1
     end
     self
