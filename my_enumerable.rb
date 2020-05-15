@@ -11,7 +11,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     self
   end
 
-  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength, Lint/RedundantCopDisableDirective, Layout/EmptyLineAfterGuardClause
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength, Lint/RedundantCopDisableDirective, Layout/EmptyLineAfterGuardClause, Performance/RedundantBlockCall, Style/DoubleNegation, Style/EvalWithLocation, Style/RedundantSelf, Security/Eval, Lint/UnneededDisable
   def my_each_with_index(&block)
     return to_enum(:my_each_with_index) unless block_given?
     n = 0
@@ -37,83 +37,72 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     result
   end
 
-  def my_all?(block = false)
+  def my_all?(*args, &block)
     a = true
+    my_arg = args[0]
+
     my_each do |element|
-      c = if block
-
-            if block.is_a?(Regexp)
+      c = if block.is_a?(Proc)
+            block.call(element)
+          elsif my_arg
+            if my_arg.is_a?(Module)
+              element.is_a?(my_arg)
+            elsif my_arg.is_a?(Regexp)
               element = element.to_s unless element.is_a? String
-              block === element # rubocop:disable Style/CaseEquality
-
-            elsif !block.is_a?(Regexp)
-              if block.is_a?(Method)
-                element.is_a?(block)
-              elsif block == element
-                block == element
-              else
-                false
-              end
+              my_arg === element # rubocop:disable Style/CaseEquality
+            elsif my_arg == element
+              my_arg == element
             end
-
-          elsif block_given?
-            yield(element)
-          elsif !block && !block_given?
-            !!element # rubocop:disable Style/DoubleNegation
+          elsif !my_arg && !block
+            !!element
           end
       a &&= c
     end
-    a
+    !!a
   end
 
-  def my_any?(block = false)
+  def my_any?(*args, &block)
     a = false
-    my_each do |element|
-      c = if block
-            if block.is_a?(Regexp)
-              element = element.to_s unless element.is_a? String
-              block === element # rubocop:disable Style/CaseEquality
+    my_arg = args[0]
 
-            elsif !block.is_a?(Regexp)
-              if block.is_a?(Method)
-                element.is_a?(block)
-              elsif block == element
-                block == element
-              else
-                false
-              end
+    my_each do |element|
+      c = if block.is_a?(Proc)
+            block.call(element)
+          elsif my_arg
+            if my_arg.is_a?(Module)
+              element.is_a?(my_arg)
+            elsif my_arg.is_a?(Regexp)
+              element = element.to_s unless element.is_a? String
+              my_arg === element # rubocop:disable Style/CaseEquality
+            elsif my_arg == element
+              my_arg == element
             end
-          elsif block_given?
-            yield(element)
-          elsif !block && !block_given?
-            !!element # rubocop:disable Style/DoubleNegation
+          elsif !my_arg && !block
+            !!element
           end
       a ||= c
     end
-    a
+    !!a
   end
 
-  def my_none?(block = false)
+  def my_none?(*args, &block)
     a = false
-    my_each do |element|
-      c = if block
-            if block.is_a?(Regexp)
-              element = element.to_s unless element.is_a? String
-              block === element # rubocop:disable Style/CaseEquality
+    my_arg = args[0]
 
-            elsif !block.is_a?(Regexp)
-              if block.is_a?(Method)
-                element.is_a?(block)
-              elsif block == element
-                block == element
-              else
-                false
-              end
+    my_each do |element|
+      c = if block.is_a?(Proc)
+            block.call(element)
+          elsif my_arg
+            if my_arg.is_a?(Module)
+              element.is_a?(my_arg)
+            elsif my_arg.is_a?(Regexp)
+              element = element.to_s unless element.is_a? String
+              my_arg === element # rubocop:disable Style/CaseEquality
+            elsif my_arg == element
+              my_arg == element
             end
-          elsif block_given?
-            yield(element)
-          elsif !block && !block_given?
-            !!element # rubocop:disable Style/DoubleNegation
+          elsif !my_arg && !block
+            !!element
           end
       a ||= c
     end
@@ -145,22 +134,35 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     result
   end
 
-  def my_inject(block = false, symbol = false)
-    if block
-      accumulator = block
-      my_each do |element|
-        if symbol.is_a?(Symbol)
-          accumulator = eval "#{accumulator} #{symbol} #{element}" # rubocop:disable Security/Eval, Style/EvalWithLocation, Metrics/LineLength
-        elsif !symbol.is_a?(Symbol)
-          "#{symbol} is not a symbol nor a string"
-        elsif !symbol
-          accumulator = yield(accumulator, element)
+  def my_inject(*args, &block)
+    if args[0].is_a?(Integer)
+      if args[1].is_a?(Symbol)
+        accumulator = args[0]
+        my_each do |element|
+          accumulator = eval "#{accumulator} #{args[1]} #{element}"
+        end
+      elsif block.is_a?(Proc)
+        accumulator = args[0]
+        my_each do |element|
+          accumulator = block.call(accumulator, element)
         end
       end
-    elsif !block
-      my_each { |element| accumulator = element == self[0] ? self[0] : yield(accumulator, element) }
+    elsif args[0].is_a?(Symbol)
+      accumulator = self[0]
+      n = 1
+      while n < self.length
+        accumulator = eval "#{accumulator} #{args[0]} #{self[n]}"
+        n += 1
+      end
+    elsif !args[0] && block.is_a?(Proc)
+      accumulator = self[0]
+      n = 1
+      while n < self.length
+        accumulator = block.call(accumulator, self[n])
+        n += 1
+      end
     end
     accumulator
   end
 end
-# rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength, Lint/RedundantCopDisableDirective, Layout/EmptyLineAfterGuardClause
+# rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength, Lint/RedundantCopDisableDirective, Layout/EmptyLineAfterGuardClause, Performance/RedundantBlockCall, Style/DoubleNegation, Style/EvalWithLocation, Style/RedundantSelf, Security/Eval, Lint/UnneededDisable
