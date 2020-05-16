@@ -124,41 +124,43 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     a
   end
 
-  def my_map
+  def my_map(&block)
     return to_enum(:my_map) unless block_given?
-
+    my_self = self.is_a?(Range) ? self.to_a : self
     result = []
-    my_each do |element|
-      result << yield(element)
+    my_self .my_each do |element|
+      result << block.call(element)
     end
     result
   end
 
   def my_inject(*args, &block)
+    my_self = self.is_a?(Range) ? self.to_a : self
+
     if args[0].is_a?(Integer)
       if args[1].is_a?(Symbol)
         accumulator = args[0]
-        my_each do |element|
+        my_self.my_each do |element|
           accumulator = eval "#{accumulator} #{args[1]} #{element}"
         end
       elsif block.is_a?(Proc)
         accumulator = args[0]
-        my_each do |element|
+        my_self.my_each do |element|
           accumulator = block.call(accumulator, element)
         end
       end
     elsif args[0].is_a?(Symbol)
-      accumulator = self[0]
+      accumulator = my_self[0]
       n = 1
-      while n < self.length
-        accumulator = eval "#{accumulator} #{args[0]} #{self[n]}"
+      while n < my_self.length
+        accumulator = eval "#{accumulator} #{args[0]} #{my_self[n]}"
         n += 1
       end
     elsif !args[0] && block.is_a?(Proc)
-      accumulator = self[0]
+      accumulator = my_self[0]
       n = 1
-      while n < self.length
-        accumulator = block.call(accumulator, self[n])
+      while n < my_self.length
+        accumulator = block.call(accumulator, my_self[n])
         n += 1
       end
     end
