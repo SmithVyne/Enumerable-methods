@@ -1,6 +1,7 @@
 module Enumerable # rubocop:disable Metrics/ModuleLength
   def my_each
-    return to_enum(:my_each) unless block_given? # rubocop:disable Metrics/ModuleLength
+    return to_enum(:my_each) unless block_given?
+    
     n = 0
     while n < length
       yield(self[n]) if is_a?(Array)
