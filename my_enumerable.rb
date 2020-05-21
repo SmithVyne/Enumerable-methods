@@ -1,4 +1,4 @@
-module Enumerable # rubocop:disable Metrics/ModuleLength
+module Enumerable # rubocop:disable Metrics/ModuleLength, Layout/EmptyLineAfterGuardClause
   def my_each
     return to_enum(:my_each) unless block_given?
     n = 0
@@ -11,7 +11,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
     self
   end
 
-  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength, Lint/RedundantCopDisableDirective, Layout/EmptyLineAfterGuardClause, Performance/RedundantBlockCall, Style/DoubleNegation, Style/EvalWithLocation, Style/RedundantSelf, Security/Eval, Lint/UnneededDisable
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength, Lint/RedundantCopDisableDirective, Performance/RedundantBlockCall, Style/DoubleNegation, Style/EvalWithLocation, Style/RedundantSelf, Security/Eval, Lint/UnneededDisable
   def my_each_with_index(&block)
     return to_enum(:my_each_with_index) unless block_given?
     n = 0
