@@ -1,6 +1,6 @@
-module Enumerable # rubocop:disable Metrics/ModuleLength, Layout/EmptyLineAfterGuardClause
+module Enumerable # rubocop:disable Metrics/ModuleLength
   def my_each
-    return to_enum(:my_each) unless block_given?
+    return to_enum(:my_each) unless block_given? # rubocop:disable Metrics/ModuleLength
     n = 0
     while n < length
       yield(self[n]) if is_a?(Array)
@@ -11,7 +11,7 @@ module Enumerable # rubocop:disable Metrics/ModuleLength, Layout/EmptyLineAfterG
     self
   end
 
-  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/LineLength, Lint/RedundantCopDisableDirective, Performance/RedundantBlockCall, Style/DoubleNegation, Style/EvalWithLocation, Style/RedundantSelf, Security/Eval, Lint/UnneededDisable
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Layout/EmptyLineAfterGuardClause, Metrics/MethodLength, Metrics/LineLength, Lint/RedundantCopDisableDirective, Performance/RedundantBlockCall, Style/DoubleNegation, Style/EvalWithLocation, Style/RedundantSelf, Security/Eval, Lint/UnneededDisable
   def my_each_with_index(&block)
     return to_enum(:my_each_with_index) unless block_given?
     n = 0
