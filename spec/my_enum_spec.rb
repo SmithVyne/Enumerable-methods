@@ -33,8 +33,20 @@ let(:arr) { [1, 2, 3, 4, 5] }
       expect(arr.my_none?(1)).to eq(arr.none?(1))
     end
   end
-
-
-
+  describe "#my_count" do 
+    it "return the same results as #count method" do
+      expect(arr.my_count).to eq(arr.count)
+    end
+  end
+  describe "#my_map" do 
+    it "return the same results as #map method" do
+      expect(arr.my_map { |x| x * x }).to eq(arr.map { |x| x * x })
+    end
+  end
+  describe "#my_inject" do 
+    it "return the same results as #inject method" do
+      expect(arr.my_inject(:+)).to eq(arr.inject(:+))
+    end
+  end
 end
 
